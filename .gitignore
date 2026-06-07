@@ -1,0 +1,5 @@
+.DS_Store
+*.log
+sysdiagnose_*
+*.tar.gz
+*.zip
