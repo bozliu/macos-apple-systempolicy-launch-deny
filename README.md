@@ -13,6 +13,11 @@ Chinese version: [README.zh-CN.md](README.zh-CN.md)
 Finder、Dock、Spotlight 或 `open` 启动时像“闪退”，但真实原因可能是
 AppleSystemPolicy 在 GUI 启动链中拒绝进程，而不是应用自身崩溃。
 
+Terminal-only repair guide:
+
+- English: [MANUAL_TERMINAL_GUIDE.md](MANUAL_TERMINAL_GUIDE.md)
+- 中文: [MANUAL_TERMINAL_GUIDE.zh-CN.md](MANUAL_TERMINAL_GUIDE.zh-CN.md)
+
 ## Symptom
 
 - Many newly installed apps immediately quit when launched from the GUI.
@@ -93,6 +98,9 @@ scripts/repair-launch-policy-cache.sh --apply
 ```
 
 The repair script is dry-run by default. Use `--apply` only after reading it.
+
+For users who do not use an AI agent, follow the complete terminal guide:
+[MANUAL_TERMINAL_GUIDE.md](MANUAL_TERMINAL_GUIDE.md).
 
 ## Apple Reporting
 

@@ -2,6 +2,11 @@
 
 这是一个中文辅助说明，英文版 [README.md](README.md) 是主文档。
 
+纯终端手动修复指南：
+
+- 英文主版：[MANUAL_TERMINAL_GUIDE.md](MANUAL_TERMINAL_GUIDE.md)
+- 中文版：[MANUAL_TERMINAL_GUIDE.zh-CN.md](MANUAL_TERMINAL_GUIDE.zh-CN.md)
+
 本仓库记录一种 macOS 故障模式：新安装的应用从 Finder、Dock、Spotlight
 或 `open` 启动时看起来像“闪退”，但应用二进制本身未必崩溃。真实现象可能是
 GUI 启动路径被 AppleSystemPolicy 拒绝。
@@ -87,6 +92,9 @@ scripts/repair-launch-policy-cache.sh --apply
 ```
 
 修复脚本默认 dry-run，只有显式传入 `--apply` 才会实际操作。
+
+如果你没有 AI agent，直接照着终端手动指南执行：
+[MANUAL_TERMINAL_GUIDE.zh-CN.md](MANUAL_TERMINAL_GUIDE.zh-CN.md)。
 
 ## 是否应该报告给 Apple
 
