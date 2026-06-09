@@ -89,6 +89,13 @@ The repair that worked in this case was:
 4. Restart policy and trust evaluation services.
 5. Validate with `open`, process checks, and fresh logs.
 
+In one observed recurrence on 2026-06-09, Gatekeeper was already enabled and
+the affected apps still assessed as notarized Developer ID apps. A user-level
+refresh was enough: clear the same top-level app attributes, re-register
+LaunchServices, and restart the current user's LaunchServices-related caches.
+Try this lower-impact path before killing system policy services when
+diagnostics already show `accepted`.
+
 The helper scripts in `scripts/` encode this shape:
 
 ```sh
@@ -131,3 +138,10 @@ is reproducible on a clean machine, file it through Feedback Assistant and attac
 After repair, Antigravity launched through `open`, stayed running, spawned its
 helper processes, and no new AppleSystemPolicy denial appeared in the validation
 window.
+
+On 2026-06-09 the same failure recurred. Recent logs showed
+`ASP: Security policy would not allow process` for Codex while `spctl --status`
+reported `assessments enabled`. After the user-level refresh, Antigravity,
+Claude, and Codex launched through `open`, `spctl --assess --type execute`
+reported `accepted`, and no fresh ASP denial appeared in the validation window.
+Tracked in [issue #1](https://github.com/bozliu/macos-apple-systempolicy-launch-deny/issues/1).

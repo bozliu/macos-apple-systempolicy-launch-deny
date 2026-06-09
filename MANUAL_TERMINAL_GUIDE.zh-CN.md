@@ -73,7 +73,34 @@ xattr -l "$APP" 2>/dev/null || true
 
 如果它成功启动，可以按 `Control-C` 停掉。
 
-## 第 3 步：先做单个 app 的定向修复
+## 第 3 步：如果是复发，先试无 sudo 的用户级刷新
+
+如果这是同一个问题再次出现，并且 `spctl --status` 已经显示
+`assessments enabled`，可以先试这个影响更小的刷新。它不需要 `sudo`，不会删除
+app，只会从顶层 app bundle 移除三类启动来源扩展属性。
+
+```sh
+for root in /Applications "$HOME/Applications"; do
+  [ -d "$root" ] || continue
+  find "$root" -maxdepth 1 -name '*.app' -print 2>/dev/null |
+  while IFS= read -r app; do
+    echo "$app"
+    for attr in com.apple.quarantine com.apple.provenance com.apple.macl; do
+      xattr -dr "$attr" "$app" 2>/dev/null || true
+    done
+  done
+done
+
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+"$LSREGISTER" -r -domain local -domain system -domain user
+
+killall -u "$USER" cfprefsd sharedfilelistd 2>/dev/null || true
+spctl --status
+```
+
+然后跳到验证步骤。如果受影响 app 仍然失败，再继续下面需要管理员权限的修复。
+
+## 第 4 步：先做单个 app 的定向修复
 
 这一步只清理受影响 app 上的 stale 启动来源扩展属性，并重新注册 LaunchServices。
 
@@ -105,7 +132,7 @@ sleep 2
 spctl --status
 ```
 
-## 第 4 步：如果很多 app 都受影响
+## 第 5 步：如果很多 app 都受影响
 
 如果多个新安装 app 都同样失败，可以对 `/Applications` 和 `~/Applications` 顶层
 app bundle 清理同样的扩展属性。
@@ -133,7 +160,7 @@ sudo killall trustevaluationagent 2>/dev/null || true
 sudo killall amfid 2>/dev/null || true
 ```
 
-## 第 5 步：验证
+## 第 6 步：验证
 
 再次启动受影响 app：
 

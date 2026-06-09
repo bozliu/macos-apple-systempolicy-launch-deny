@@ -83,6 +83,11 @@ Gatekeeper、provenance/quarantine 状态或系统策略缓存。
 4. 重启策略和信任评估相关服务。
 5. 用 `open`、进程检查和 fresh log 验证。
 
+2026-06-09 观察到一次复发：Gatekeeper 已经是 enabled，受影响 app 仍能通过
+Developer ID 公证评估。此时无 sudo 的用户级刷新就足够恢复：清理顶层 app 上
+同样的扩展属性，重新注册 LaunchServices，并重启当前用户的 LaunchServices
+相关缓存。若诊断已经显示 `accepted`，可以先试这个影响更小的路径。
+
 辅助脚本：
 
 ```sh
@@ -124,3 +129,10 @@ Feedback Assistant，并附上：
 
 修复后，Antigravity 可通过 `open` 启动并保持运行，helper 进程正常出现；
 验证窗口内没有再出现新的 AppleSystemPolicy deny。
+
+2026-06-09 同类故障复发。最近日志显示 Codex 出现
+`ASP: Security policy would not allow process`，同时 `spctl --status` 是
+`assessments enabled`。执行用户级刷新后，Antigravity、Claude、Codex 都能通过
+`open` 启动，`spctl --assess --type execute` 显示 `accepted`，验证窗口内没有
+新的 ASP 拒绝。跟踪记录见
+[issue #1](https://github.com/bozliu/macos-apple-systempolicy-launch-deny/issues/1)。
