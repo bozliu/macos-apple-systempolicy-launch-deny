@@ -77,7 +77,36 @@ Notes:
 
 Press `Control-C` to stop it if it starts successfully.
 
-## Step 3: Try A Targeted Repair First
+## Step 3: For Recurrences, Try The User-Level Refresh First
+
+If this exact problem came back and `spctl --status` already says
+`assessments enabled`, try this lower-impact refresh first. It does not use
+`sudo`, does not delete apps, and only removes three launch-source attributes
+from top-level app bundles.
+
+```sh
+for root in /Applications "$HOME/Applications"; do
+  [ -d "$root" ] || continue
+  find "$root" -maxdepth 1 -name '*.app' -print 2>/dev/null |
+  while IFS= read -r app; do
+    echo "$app"
+    for attr in com.apple.quarantine com.apple.provenance com.apple.macl; do
+      xattr -dr "$attr" "$app" 2>/dev/null || true
+    done
+  done
+done
+
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+"$LSREGISTER" -r -domain local -domain system -domain user
+
+killall -u "$USER" cfprefsd sharedfilelistd 2>/dev/null || true
+spctl --status
+```
+
+Then skip to the validation step. If affected apps still fail, continue with the
+administrator repair below.
+
+## Step 4: Try A Targeted Repair
 
 This clears stale launch-source attributes only from the affected app and
 re-registers LaunchServices.
@@ -111,7 +140,7 @@ sleep 2
 spctl --status
 ```
 
-## Step 4: If Many Apps Are Affected
+## Step 5: If Many Apps Are Affected
 
 If multiple newly installed apps fail the same way, clear the same attributes
 from top-level app bundles in `/Applications` and `~/Applications`.
@@ -139,7 +168,7 @@ sudo killall trustevaluationagent 2>/dev/null || true
 sudo killall amfid 2>/dev/null || true
 ```
 
-## Step 5: Validate
+## Step 6: Validate
 
 Launch the affected app again:
 
